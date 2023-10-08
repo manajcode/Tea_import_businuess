@@ -1,0 +1,246 @@
+#Data definition Language
+#build database:
+CREATE DATABASE Tea;
+SHOW CREATE DATABASE Tea;
+USE Tea;
+
+
+
+
+# building up tables:
+
+CREATE TABLE products
+(
+  product_id int unsigned NOT NULL AUTO_INCREMENT, # Unique ID for the record
+  productname varchar(255) NOT NULL,                # Name of the tea product
+  straintea varchar(255) NOT NULL,                # Type of tea black, green, white, herbal
+  countrysource varchar(255) NOT NULL,                # Country where the tea comes from
+  priceperlbproduct decimal,
+  plantationname VARCHAR(255),
+  PRIMARY KEY (product_id)  # Make the id the primary key                                
+);
+
+
+CREATE TABLE customers
+(
+  customer_id int unsigned NOT NULL AUTO_INCREMENT, # Unique ID for the customer
+  first_name varchar(255) NOT NULL,                
+  last_name varchar(255) NOT NULL,
+  business_associated_with_customer varchar(255) NOT NULL,                
+  PRIMARY KEY (customer_id)                                  
+);
+
+
+
+CREATE TABLE orders
+(
+  order_id int unsigned NOT NULL AUTO_INCREMENT,
+  order_grouping 
+  orderdate Date,                                      #order date   
+  shippingaddress varchar(255) NOT NULL,                # where customer order going
+  product_id int unsigned,
+  customer_id int unsigned,
+  ordernumber int unsigned,
+  pounds of order product int unsigned,
+  PRIMARY KEY (order_id),
+  Foreign KEY (product_id) REFERENCES products(product_id),
+  Foreign KEY (customer_id) REFERENCES customers(customer_id) 
+);
+
+#Data Manipulation Language for products
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('Kerala_special', 'Green', 'India', 35.90, 'Elephant Field');
+
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('Assam', 'Black', 'India', 36.00, 'Elephant Field');
+
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('White_special', 'White', 'China', 80.00, 'Huang Teas');
+
+
+INSERT INTO products (productname, straintea, countrysource, priceperlbproduct, plantationname)
+VALUES ('Bitterblack', 'Black', 'India', 40.00, 'Elephant Field');
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('Spiced black', 'Black', 'India', 45.00, 'Elephant Field');
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('Sencha', 'Green', 'Japan', 55.00, 'Gyoko plantation');
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('Bancha', 'Green', 'Japan', 28.00, 'Sun');
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('Chun Mee','Green','China',25.00,'Tiger_strength' );
+
+INSERT INTO products (productname, straintea, countrysource,priceperlbproduct, plantationname)
+VALUES ('vitamin tea','puer','China',70.00,'good afternoon manufacturing');
+
+
+
+#Data Manipulation Language for customers 
+
+INSERT INTO customers (first_name, last_name, business_associated_with_customer)
+VALUES ('Guo','Zhang','Jade Tiger');
+
+INSERT INTO customers (first_name, last_name, business_associated_with_customer )
+VALUES ('Yan','Wu','San Jose Tea House');
+
+INSERT INTO customers (first_name, last_name, business_associated_with_customer )
+VALUES ('Sam','Ma','Refreshing_Bevarage');
+
+INSERT INTO customers (first_name, last_name, business_associated_with_customer )
+VALUES ('Frances','Agarwal','East_Bay_Tea');
+
+#DELETE FROM customers
+#WHERE customer_id IN (3, 4);
+
+#Data Manipulation Language for orders:
+
+INSERT INTO orders (order_id, orderdate, shippingaddress, product_id, customer_id, ordernumber, pounds_product_order)
+VALUES
+    (1, '2023-08-28', '29_ElCamino_Street_San_Jose 95014', 7, 2, 1, 15),
+    (2, '2023-08-28', '29_ElCamino_Street_San_Jose 95014', 6, 2, 1, 20);
+
+
+ 
+INSERT INTO orders (order_id, orderdate, shippingaddress, product_id, customer_id, ordernumber, pounds_product_order )
+VALUES
+    (3, '2023-08-30', '180_Moraga_street_SanFrancisco_94122', 8, 1, 2, 20),
+    (4, '2023-08-30', '180_Moraga_street_SanFrancisco_94122', 1, 1, 2,15),
+    (5, '2023-08-30', '180_Moraga_street_SanFrancisco_94122', 3, 1, 2,15);
+
+INSERT INTO orders (order_id, orderdate, shippingaddress, product_id, customer_id, ordernumber, pounds_product_order )
+VALUES
+    (6, '2023-09-01', '44_main_street_Fremont_94537', 9, 3, 3,20),
+    (7, '2023-09-01', '44_main_street_Fremont_94537', 5, 3, 3,15),
+    (8, '2023-09-03', '12th_Street_Hayward_94541',          4, 4, 4,15);
+
+
+
+
+
+#joining tables using foreign keys:
+
+ select*
+ from orders
+ join products on orders.product_id=products.product_id
+ join customers on orders.customer_id=customers.customer_id
+
+# create a view of all three tables joined together tables
+
+CREATE VIEW all_three_tables_joined AS
+SELECT
+    orders.order_id,
+    orders.customer_id,
+    orders.product_id AS order_product_id,
+    products.product_id AS product_product_id,
+    customers.customer_id AS customer_customer_id,
+    orders.orderdate,
+    orders.shippingaddress,
+    orders.ordernumber,
+    orders.pounds_product_order,
+    customers.first_name,
+    customers.last_name,
+    customers.business_associated_with_customer,
+    products.productname,
+    products.straintea,
+    products.countrysource,
+    products.priceperlbproduct, 
+    products.plantationname,
+    orders.pounds_product_order*products.priceperlbproduct AS total_price_for_product     
+    
+FROM
+    orders
+INNER JOIN
+    products ON orders.product_id = products.product_id
+INNER JOIN
+    customers ON orders.customer_id = customers.customer_id;
+
+
+#Query other three tables:
+Select *
+From products
+where priceperlbproduct >= 30;
+
+Select *
+From products
+order by countrysource, straintea;
+
+Select *
+From products
+where straintea like '%B%';
+
+SELECT
+    orders.order_id,
+    orders.customer_id,
+    orders.product_id AS order_product_id,
+    products.product_id AS product_product_id,
+    
+    orders.orderdate,
+    orders.shippingaddress,
+    orders.ordernumber,
+    orders.pounds_product_order,
+    products.productname,
+    products.straintea,
+    products.countrysource,
+    products.priceperlbproduct, 
+    products.plantationname,
+    orders.pounds_product_order*products.priceperlbproduct AS total_price_for_product     
+    
+FROM
+    orders
+Right JOIN
+    products ON orders.product_id = products.product_id
+
+
+#Query the view for important data:
+#bring up the entire view:
+describe all_three_tables_joined;
+select* from all_three_tables_joined;
+
+select first_name, last_name, ordernumber
+from all_three_tables_joined
+ORDER BY ordernumber ASC;
+
+
+#or bring up the sales data of each order:
+select
+    straintea,
+    pounds_product_order,
+    priceperlbproduct,
+    total_price_for_product,
+    ordernumber
+    
+from all_three_tables_joined
+ORDER BY ordernumber ASC;
+
+# to get the total price each customer needs to pay for each order across all products in each order.
+SELECT ordernumber, SUM(total_price_for_product) AS total_price_per_order
+from all_three_tables_joined
+GROUP BY ordernumber
+ORDER BY ordernumber ASC;
+
+
+SELECT first_name, last_name, ordernumber, SUM(total_price_for_product) AS total_price_per_order
+from all_three_tables_joined
+GROUP BY ordernumber, first_name, last_name
+ORDER BY ordernumber ASC;
+
+
+
+SELECT ordernumber, SUM(total_price_for_product) AS total_price_per_order
+from all_three_tables_joined
+GROUP BY ordernumber
+ORDER BY total_price_per_order DESC
+
+
+
+
+
+
+
+
